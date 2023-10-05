@@ -28,11 +28,17 @@ class DatabaseSeeder extends Seeder
         for ($i = 1; $i <= 10; $i++){
             $posts -> add(
                 Post::factory()->create([
-                    'user_id' => $users -> random()
+                    'author_id' => $users -> random()
                 ])
             );
         }
 
         // TODO: N-N (post-tag)
+        for ($i = 1; $i <= 5; $i++){
+            $tag = Tag::factory() -> create();
+            $tag -> posts() -> sync(
+                $posts -> random( rand(1, $posts -> count()) ) -> pluck('id')
+            );
+        }
     }
 }
