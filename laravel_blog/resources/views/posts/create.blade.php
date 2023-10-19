@@ -1,0 +1,25 @@
+@extends('demo.layout')
+
+@section('content')
+
+<form method="POST" action="{{ route('posts.store') }}">
+    @csrf
+    <h1>Új bejegyzés</h1>
+    Cím: <input type="text" name="title" value="{{ old('title') }}"><br>
+
+    @error('title')
+    {{ $message }}
+    @enderror
+
+    Tartalom:<br>
+    <textarea name="content">{{ old('content') }} </textarea><br>
+    Szerző:
+    <select name="author_id">
+        @foreach ($users as $u)
+        <option value="{{ $u -> id }}">{{ $u -> name }}</option>
+        @endforeach
+    </select><br>
+    <button type="submit">Küldés</button>
+</form>
+
+@endsection

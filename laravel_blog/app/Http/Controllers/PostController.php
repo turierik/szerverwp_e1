@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Post;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class PostController extends Controller
@@ -24,7 +25,9 @@ class PostController extends Controller
      */
     public function create()
     {
-        //
+        return view('posts.create', [
+            'users' => User::all()
+        ]);
     }
 
     /**
@@ -32,7 +35,16 @@ class PostController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validated = $request -> validate([
+            'title' => 'required|string|min:3',
+            'content' => 'required|string|min:20',
+            'author_id' => 'required|integer|exists:users,id'
+        ], [
+            'title.min' => 'Hoppácska!'
+        ]);
+
+        // itt feltételezhetem, hogy minden jó :)
+        return "akármi";
     }
 
     /**
@@ -40,7 +52,9 @@ class PostController extends Controller
      */
     public function show(Post $post)
     {
-        //
+        return view('posts.show', [
+            'post' => $post
+        ]);
     }
 
     /**
