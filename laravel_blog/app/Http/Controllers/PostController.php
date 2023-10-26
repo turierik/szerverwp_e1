@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Post;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Session;
 
 class PostController extends Controller
 {
@@ -26,7 +27,8 @@ class PostController extends Controller
     public function create()
     {
         return view('posts.create', [
-            'users' => User::all()
+            'users' => User::all(),
+            'tags' => \App\Models\Tag::all()
         ]);
     }
 
@@ -38,13 +40,18 @@ class PostController extends Controller
         $validated = $request -> validate([
             'title' => 'required|string|min:3',
             'content' => 'required|string|min:20',
-            'author_id' => 'required|integer|exists:users,id'
+            'author_id' => 'required|integer|exists:users,id',
+            'tags[]' => 'array',
+            'tags.*' => 'integer|distinct|exists:tags,id'
         ], [
             'title.min' => 'Hoppácska!'
         ]);
 
         // itt feltételezhetem, hogy minden jó :)
-        return "akármi";
+        $post = Post::create($validated);
+        $post -> tags() -> sync($validated['tags'] ?? []);
+        Session::flash('post-created');
+        return redirect() -> route('posts.index');
     }
 
     /**
@@ -62,7 +69,11 @@ class PostController extends Controller
      */
     public function edit(Post $post)
     {
-        //
+        return view('posts.edit', [
+            'users' => User::all(),
+            'tags' => \App\Models\Tag::all(),
+            'post' => $post
+        ]);
     }
 
     /**
@@ -70,7 +81,21 @@ class PostController extends Controller
      */
     public function update(Request $request, Post $post)
     {
-        //
+        $validated = $request -> validate([
+            'title' => 'required|string|min:3',
+            'content' => 'required|string|min:20',
+            'author_id' => 'required|integer|exists:users,id',
+            'tags[]' => 'array',
+            'tags.*' => 'integer|distinct|exists:tags,id'
+        ], [
+            'title.min' => 'Hoppácska!'
+        ]);
+
+        // itt feltételezhetem, hogy minden jó :)
+        $post -> update($validated);
+        $post -> tags() -> sync($validated['tags'] ?? []);
+        Session::flash('post-updated');
+        return redirect() -> route('posts.index');
     }
 
     /**
