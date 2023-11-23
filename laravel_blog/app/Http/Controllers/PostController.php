@@ -6,6 +6,7 @@ use App\Models\Post;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Auth;
 
 class PostController extends Controller
 {
@@ -26,6 +27,7 @@ class PostController extends Controller
      */
     public function create()
     {
+        $this -> authorize('create', Post::class);
         return view('posts.create', [
             'users' => User::all(),
             'tags' => \App\Models\Tag::all()
@@ -37,16 +39,17 @@ class PostController extends Controller
      */
     public function store(Request $request)
     {
+        $this -> authorize('create', Post::class);
         $validated = $request -> validate([
             'title' => 'required|string|min:3',
             'content' => 'required|string|min:20',
-            'author_id' => 'required|integer|exists:users,id',
+            // 'author_id' => 'required|integer|exists:users,id',
             'tags[]' => 'array',
             'tags.*' => 'integer|distinct|exists:tags,id'
         ], [
             'title.min' => 'Hoppácska!'
         ]);
-
+        $validated['author_id'] = Auth::id();
         // itt feltételezhetem, hogy minden jó :)
         $post = Post::create($validated);
         $post -> tags() -> sync($validated['tags'] ?? []);

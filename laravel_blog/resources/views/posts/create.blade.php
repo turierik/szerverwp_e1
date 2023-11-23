@@ -13,12 +13,6 @@
 
     Tartalom:<br>
     <textarea name="content">{{ old('content') }} </textarea><br>
-    Szerző:
-    <select name="author_id">
-        @foreach ($users as $u)
-        <option value="{{ $u -> id }}">{{ $u -> name }}</option>
-        @endforeach
-    </select><br>
 
     Címkék:<br>
     @foreach ($tags as $t)
